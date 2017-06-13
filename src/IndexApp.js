@@ -76,6 +76,7 @@ class IndexApp extends Component{
   render(){
     return(
       <Navigator
+        initialRoute={{routeName: 'home'}}
         renderScene={this._renderScene}
         configureScene={this._configureScene}
       />
