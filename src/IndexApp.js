@@ -76,7 +76,6 @@ class IndexApp extends Component{
   render(){
     return(
       <Navigator
-        initialRoute={{routeName: 'checkout'}}
         renderScene={this._renderScene}
         configureScene={this._configureScene}
       />
