@@ -25,7 +25,7 @@ class LineOfProductsDetails extends Component{
       thumbnailUrl: null,
       title: null,
       bodyHtml: null,
-      prise: null,
+      price: null,
       quantity: 1,
       showActivityIndicator: false,
       products: null,
@@ -52,7 +52,7 @@ class LineOfProductsDetails extends Component{
               thumbnailUrl: onResolve.val().thumbnailUrl,
               title: onResolve.val().title,
               bodyHtml: onResolve.val().bodyHtml,
-              prise: onResolve.val().prise,
+              price: onResolve.val().price,
               showActivityIndicator: false
             })
           }, 1000)
@@ -91,7 +91,7 @@ class LineOfProductsDetails extends Component{
     let product = {
       key: this.state.key,
       title: this.state.title,
-      prise: this.state.prise,
+      price: this.state.price,
       quantity: this.state.quantity,
     };
     products.push(product);
@@ -118,7 +118,7 @@ class LineOfProductsDetails extends Component{
           />
           <View style={styles.articleTextContainer}>
             <Text style={styles.titleStyle}>{this.state.title}</Text>
-            <Text style={styles.priseStyle}>${this.state.prise}</Text>
+            <Text style={styles.priseStyle}>${this.state.price}</Text>
             <View style={styles.verticalStyle}>
               <TouchableOpacity onPress={this._changeQuantity.bind(this,0)}>
                 <Icon

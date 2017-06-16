@@ -37,7 +37,7 @@ const Product = (props) => {
           />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.productTextStyle, {width: 70}]}>${(props.prise * props.quantity)}</Text>
+      <Text style={[styles.productTextStyle, {width: 70}]}>${(props.price * props.quantity)}</Text>
       <TouchableOpacity onPress={props.deleteProduct}>
         <Icon
           name="delete"
@@ -167,7 +167,7 @@ async _deleteProduct(index){
                     key={i}
                     productKey={item.key}
                     quantity={item.quantity}
-                    prise={item.prise}
+                    price={item.price}
                     reduceQuantity={this._reduceQuantity.bind(this, item.key)}
                     addQuantity={this._addQuantity.bind(this, item.key)}
                     deleteProduct={this._deleteProduct.bind(this, i)}
