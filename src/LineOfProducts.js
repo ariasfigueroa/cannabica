@@ -14,7 +14,7 @@ import Menu from './components/Menu'
 import DynamicList from './components/DynamicList';
 import { firebaseApp } from './lib/firebase';
 
-const shopSections = ['/screens/shop/wellness','/screens/shop/kids','/screens/shop/skincare','/screens/shop/pets']
+const productsPath = '/products';
 
 class LineOfProducts extends Component{
 
@@ -26,52 +26,53 @@ class LineOfProducts extends Component{
       kidsData: null,
       skincareData: null,
       petsData: null,
+      showActivityIndicator: false,
     }
     console.log(props);
   }
 
   componentWillMount(){
     try {
-      for (var index = 0; index < shopSections.length; index++){
-        var ref = firebaseApp.database().ref(shopSections[index])
-        ref.once('value', (snapshot) => {
-          if (snapshot.val()){
-            this.getThumnails(snapshot, snapshot.key)
-          }
-        })
-      }
+      this.setState({showActivityIndicator: true})
+      var ref = firebaseApp.database().ref(productsPath)
+      ref.once('value', (snapshot) => {
+        if (snapshot.val()){
+          this.getThumnails(snapshot)
+        }
+      })
     } catch (error) {
       console.log(error)
     }
   }
 
-  async getThumnails (snapshot, listType){
+  async getThumnails (snapshot){
     var thumbnailsArray = [];
     await snapshot.forEach((childSnapshot) => {
       var childKey = childSnapshot.key;
       var childData = childSnapshot.val();
       if (childData){
-        thumbnailsArray.push({key: childData.key, name: childData.name, image: childData.thumbnailUrl, targetScreen: 'lineOfProductsDetails'})
+        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrlSmall, targetScreen: 'lineOfProductsDetails', category: childData.category})
       }
     });
-    switch(listType){
-        case 'wellness' : {
-          this.setState({wellnessData: thumbnailsArray})
-          break
-        }
-        case 'kids' : {
-          this.setState({kidsData: thumbnailsArray})
-          break
-        }
-        case 'skincare' : {
-          this.setState({skincareData: thumbnailsArray})
-          break
-        }
-        case 'pets' : {
-          this.setState({petsData: thumbnailsArray})
-          break
-        }
-      }
+
+    const kids = thumbnailsArray.filter(asset => {
+        return asset.category.indexOf('kids') > -1;
+      })
+
+    const wellness = thumbnailsArray.filter(asset => {
+        return asset.category.indexOf('wellness') > -1;
+      })
+
+    const skincare = thumbnailsArray.filter(asset => {
+        return asset.category.indexOf('skincare') > -1;
+      })
+
+    const pets = thumbnailsArray.filter(asset => {
+        return asset.category.indexOf('pets') > -1;
+      })
+    this.setState({petsData: pets, kidsData: kids, wellnessData: wellness, skincareData: skincare, showActivityIndicator: false});
+
+
   }
 
 toggle(){
@@ -85,7 +86,7 @@ updateMenu(isOpen){
 }
 
   render(){
-    if (this.state.wellnessData && this.state.kidsData && this.state.skincareData && this.state.petsData){
+    if (this.state.showActivityIndicator === false){
       return (
         <View style={styles.container}>
           <SideMenu
@@ -95,10 +96,10 @@ updateMenu(isOpen){
           >
             <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
-              <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator}/>
-              <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator}/>
-              <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator}/>
-              <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator}/>
+              {this.state.wellnessData ? <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator}/> : null}
+              {this.state.kidsData ? <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator}/> : null}
+              {this.state.skincareData ? <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator}/> : null}
+              {this.state.petsData ? <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator}/> : null}
             </ScrollView>
           </SideMenu>
         </View>
