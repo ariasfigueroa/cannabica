@@ -51,7 +51,7 @@ class LineOfProducts extends Component{
       var childKey = childSnapshot.key;
       var childData = childSnapshot.val();
       if (childData){
-        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrlSmall, targetScreen: 'lineOfProductsDetails', category: childData.category})
+        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrlSmall, targetScreen: 'lineOfProductsDetails', category: childData.category, price: childData.price})
       }
     });
 
@@ -96,10 +96,10 @@ updateMenu(isOpen){
           >
             <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
-              {this.state.wellnessData ? <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator}/> : null}
-              {this.state.kidsData ? <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator}/> : null}
-              {this.state.skincareData ? <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator}/> : null}
-              {this.state.petsData ? <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator}/> : null}
+              {(this.state.wellnessData && this.state.wellnessData.length > 0) ? <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator}/> : null}
+              {(this.state.kidsData && this.state.kidsData.length > 0) ? <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator}/> : null}
+              {(this.state.skincareData && this.state.skincareData.length > 0) ? <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator}/> : null}
+              {(this.state.petsData && this.state.petsData.length > 0) ? <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator}/> : null}
             </ScrollView>
           </SideMenu>
         </View>

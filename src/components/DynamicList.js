@@ -35,11 +35,17 @@ addToShoppingCar(key){
 
 _renderItem(item) {
   return(
-    <View>
+    <View style={styles.productContainer}>
       <TouchableOpacity onPress={this.showProductDetails.bind(this, item.key)} >
         <CachedImage style={styles.image} source={{uri: item.image}} />
       </TouchableOpacity>
       <TouchableOpacity onPress={this.addToShoppingCar.bind(this, item.key)} >
+        <Text style={styles.textTitleStyle}>
+          {item.name}
+        </Text>
+        <Text style={[styles.textTitleStyle, styles.textPriceStyle]}>
+          ${item.price}
+        </Text>
         <View style={styles.buttonContainer}>
           <Text style={styles.textButton}>
             Add to
@@ -104,5 +110,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  textTitleStyle: {
+    width: 120,
+    textAlign: 'center',
+    marginTop: 5,
+    fontSize: 12,
+    color: '#4A4A4A',
+    paddingHorizontal: 4,
+  },
+  productContainer: {
+    backgroundColor: '#FFFFFF'
+  },
+  textPriceStyle: {
+    fontWeight: '700',
   }
 });
