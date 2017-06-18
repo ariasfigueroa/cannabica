@@ -2,5 +2,6 @@ import {
   AppRegistry,
 } from 'react-native';
 
-import App from './src/App';
-AppRegistry.registerComponent('cannabica', () => App);
+import IndexApp from './src/IndexApp';
+
+AppRegistry.registerComponent('cannabica', () => IndexApp);
