@@ -17,6 +17,37 @@ import CheckoutHelper from '../lib/CheckoutHelper';
 
 import { firebaseApp } from '../lib/firebase'
 
+const search = (item, array) => {
+  //get min, mid and max index
+  let min = 0;
+  let max = array.length - 1;
+  let mid = Math.round(max / 2);
+
+  //check bounds
+  if (item.key < array[min].key || item.key > array[max].key){
+    console.log("Item : " + item + " was not found...")
+    return -1;
+  }
+
+  //get the value in the middle of the array to calculate the side
+  let middleItem = array[mid];
+
+  //check the item
+  if (item.key < middleItem.key){
+    // slice the array
+    var slice = array.slice(min, mid);
+    search(item, slice);
+  } else if (item.key > middleItem.key){
+    // slice the array
+    var slice = array.slice(mid);
+    search(item, slice);
+  } else {
+    console.log("The item has been found: " + item + " ...");
+    return mid;
+  }
+  return mid;
+}
+
 class LineOfProductsDetails extends Component{
   constructor(props){
     super(props);
@@ -87,24 +118,26 @@ class LineOfProductsDetails extends Component{
   }
 
   _addProductToCheckout(){
+    console.log("top of _addProductToCheckout");
     var products = [];
-    let product = {
+    let item = {
       key: this.state.key,
       title: this.state.title,
       price: this.state.price,
       quantity: this.state.quantity,
     };
-    products.push(product);
-      CheckoutHelper.setGlobalCheckout(products, true, (error) => {
+    products.push(item);
+      CheckoutHelper.setItemAsyncStorage(item, (error) => {
         if (error){
-          console.log(error)
+          console.log(error);
         } else {
-          console.log(products);
           this.setState({products: products, headerKey:  Math.random()});
-          alert(this.state.title +'has been added to the car');
+          alert(this.state.title +' has been added to the car');
         }
-      })
+      }, search);
   }
+
+
 
   render(){
     if (this.state.showActivityIndicator === false){

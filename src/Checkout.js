@@ -96,7 +96,8 @@ _reduceQuantity(key){
   this.state.products.forEach((item, index, array) => {
     if (key === item.key && item.quantity > 1){
       item.quantity -= 1;
-      currentProducts = array
+      currentProducts = array;
+
     }
   });
   if (currentProducts !== null){
@@ -120,7 +121,7 @@ _addQuantity(key){
   });
   if (currentProducts){
     // update the AsyncStorage
-    CheckoutHelper.setGlobalCheckout(currentProducts, false, (error) => {
+    CheckoutHelper.setGlobalCheckout(currentProducts, true, (error) => {
       if (error !== null){
         console.log(error);
       }
@@ -130,10 +131,11 @@ _addQuantity(key){
 }
 
 async _deleteProduct(index){
+  var currentProduct = this.state.products[index];
   var currentProducts = this.state.products;
-  let itemRemoved = currentProducts.splice(index, 1)
+  currentProducts.splice(index, 1);
   // delete product from AsyncStorage
-  await CheckoutHelper.setGlobalCheckout(currentProducts, false, (error) => {
+  await CheckoutHelper.deleteGlobalCheckout([currentProduct], (error) => {
     if (error !== null){
       console.log(error);
     }
