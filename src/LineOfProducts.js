@@ -27,6 +27,7 @@ class LineOfProducts extends Component{
       skincareData: null,
       petsData: null,
       showActivityIndicator: false,
+      headerKey: 0,
     }
     console.log(props);
   }
@@ -85,6 +86,10 @@ updateMenu(isOpen){
   this.setState({isOpen});
 }
 
+refreshHeaderKey(){
+  this.setState({headerKey: Math.random()})
+}
+
   render(){
     if (this.state.showActivityIndicator === false){
       return (
@@ -94,12 +99,12 @@ updateMenu(isOpen){
             isOpen={this.state.isOpen}
             onChange={(isOpen) => this.updateMenu(isOpen)}
           >
-            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <Header key={this.state.headerKey} toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
-              {(this.state.wellnessData && this.state.wellnessData.length > 0) ? <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator}/> : null}
-              {(this.state.kidsData && this.state.kidsData.length > 0) ? <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator}/> : null}
-              {(this.state.skincareData && this.state.skincareData.length > 0) ? <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator}/> : null}
-              {(this.state.petsData && this.state.petsData.length > 0) ? <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator}/> : null}
+              {(this.state.wellnessData && this.state.wellnessData.length > 0) ? <DynamicList data={this.state.wellnessData} title={'Wellness'} navigator={this.props.navigator} refreshHeaderKey={this.refreshHeaderKey.bind(this)}/> : null}
+              {(this.state.kidsData && this.state.kidsData.length > 0) ? <DynamicList data={this.state.kidsData} title={'Kids'} navigator={this.props.navigator} refreshHeaderKey={this.refreshHeaderKey.bind(this)}/> : null}
+              {(this.state.skincareData && this.state.skincareData.length > 0) ? <DynamicList data={this.state.skincareData} title={'Skin Care'} navigator={this.props.navigator} refreshHeaderKey={this.refreshHeaderKey.bind(this)}/> : null}
+              {(this.state.petsData && this.state.petsData.length > 0) ? <DynamicList data={this.state.petsData} title={'Pets'} navigator={this.props.navigator} refreshHeaderKey={refreshHeaderKey.bind(this)}/> : null}
             </ScrollView>
           </SideMenu>
         </View>
