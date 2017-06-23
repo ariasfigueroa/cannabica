@@ -127,14 +127,14 @@ class LineOfProductsDetails extends Component{
       quantity: this.state.quantity,
     };
     products.push(item);
-      CheckoutHelper.setItemAsyncStorage(item, (error) => {
-        if (error){
-          console.log(error);
-        } else {
-          this.setState({products: products, headerKey:  Math.random()});
-          alert(this.state.title +' has been added to the car');
-        }
-      }, search);
+    CheckoutHelper.setItemAsyncStorage(item, (error) => {
+      if (error){
+        console.log(error);
+      } else {
+        this.setState({products: products, headerKey:  Math.random()});
+        alert(this.state.title +' has been added to the car');
+      }
+    }, search);
   }
 
 

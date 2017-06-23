@@ -49,6 +49,37 @@ const Product = (props) => {
   )
 }
 
+const search = (item, array) => {
+  //get min, mid and max index
+  let min = 0;
+  let max = array.length - 1;
+  let mid = Math.round(max / 2);
+
+  //check bounds
+  if (item.key < array[min].key || item.key > array[max].key){
+    console.log("Item : " + item + " was not found...")
+    return -1;
+  }
+
+  //get the value in the middle of the array to calculate the side
+  let middleItem = array[mid];
+
+  //check the item
+  if (item.key < middleItem.key){
+    // slice the array
+    var slice = array.slice(min, mid);
+    search(item, slice);
+  } else if (item.key > middleItem.key){
+    // slice the array
+    var slice = array.slice(mid);
+    search(item, slice);
+  } else {
+    console.log("The item has been found: " + item + " ...");
+    return mid;
+  }
+  return mid;
+}
+
 class Checkout extends Component{
 
   constructor(props) {
@@ -91,42 +122,45 @@ updateMenu(isOpen){
   this.setState({isOpen});
 }
 
-_reduceQuantity(key){
+_reduceQuantity(item){
   var currentProducts = null;
-  this.state.products.forEach((item, index, array) => {
-    if (key === item.key && item.quantity > 1){
-      item.quantity -= 1;
-      currentProducts = array;
-
-    }
-  });
-  if (currentProducts !== null){
-    // update the AsyncStorage
-    CheckoutHelper.setGlobalCheckout(currentProducts, false, (error) => {
-      if (error !== null){
-        console.log(error);
-      }
-    });
-    this.setState({products: currentProducts, headerKey: Math.random()});
-  }
-}
-
-_addQuantity(key){
-  var currentProducts = null;
-  this.state.products.forEach((item, index, array) => {
-    if (key === item.key && item.quantity > 0){
-      item.quantity += 1;
+  this.state.products.forEach((itemLocal, indexLocal, array) => {
+    if (item.key === itemLocal.key && itemLocal.quantity > 0){
+      itemLocal.quantity -= 1;
+      item.quantity = itemLocal.quantity;
       currentProducts = array
     }
   });
   if (currentProducts){
     // update the AsyncStorage
-    CheckoutHelper.setGlobalCheckout(currentProducts, true, (error) => {
-      if (error !== null){
+    CheckoutHelper.updateItemAsyncStorage(item, (error) => {
+      if (error){
         console.log(error);
+      } else {
+        this.setState({products: currentProducts, headerKey: Math.random()});
       }
-    });
-    this.setState({products: currentProducts, headerKey: Math.random()});
+    }, search);
+  }
+}
+
+_addQuantity(item){
+  var currentProducts = null;
+  this.state.products.forEach((itemLocal, indexLocal, array) => {
+    if (item.key === itemLocal.key && itemLocal.quantity > 0){
+      itemLocal.quantity += 1;
+      item.quantity = itemLocal.quantity;
+      currentProducts = array
+    }
+  });
+  if (currentProducts){
+    // update the AsyncStorage
+    CheckoutHelper.updateItemAsyncStorage(item, (error) => {
+      if (error){
+        console.log(error);
+      } else {
+        this.setState({products: currentProducts, headerKey: Math.random()});
+      }
+    }, search);
   }
 }
 
@@ -170,8 +204,8 @@ async _deleteProduct(index){
                     productKey={item.key}
                     quantity={item.quantity}
                     price={item.price}
-                    reduceQuantity={this._reduceQuantity.bind(this, item.key)}
-                    addQuantity={this._addQuantity.bind(this, item.key)}
+                    reduceQuantity={this._reduceQuantity.bind(this, item)}
+                    addQuantity={this._addQuantity.bind(this, item)}
                     deleteProduct={this._deleteProduct.bind(this, i)}
                     />
                   )}

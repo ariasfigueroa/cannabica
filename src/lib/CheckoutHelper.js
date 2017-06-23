@@ -182,6 +182,69 @@ class CheckoutHelper {
       console.log(error)
     }
   }
+
+  static updateItemAsyncStorage (item, callback, search){
+    try {
+      console.log("top of setItemAsyncStorage")
+      if (item == null || item.length == 0){
+        console.error("item is null...");
+        return;
+      }
+      AsyncStorage.getItem(_CHECKOUT_GLOBAL_NAME, (asyncError, results) => {
+        if (asyncError){
+          console.log(asyncError);
+        } else if (results){
+          // convert the results in a JSON Array using JSON.parse()
+          var checkoutGlobalItems = JSON.parse(results);
+          console.log(checkoutGlobalItems);
+            // validate if checkoutGlobalItems is not null and is not empty
+            if (checkoutGlobalItems && checkoutGlobalItems.length > 0){
+              let itemIndex = search(item, checkoutGlobalItems);
+              console.log(itemIndex);
+              if (itemIndex < 0) {
+                //Item not found
+                console.log("product not found");
+                checkoutGlobalItems.push(item);
+                //process the array in AsyncStorage
+                AsyncStorage.removeItem(_CHECKOUT_GLOBAL_NAME, (error) => {
+                  if (error) {
+                    console.log(error);
+                  }
+                });
+                AsyncStorage.setItem(_CHECKOUT_GLOBAL_NAME, JSON.stringify(checkoutGlobalItems), (error) => {
+                  callback(error);
+                });
+              } else {
+                console.log("product found");
+                //item found
+                checkoutGlobalItems.findIndex((elementLocal, indexLocal, arrayLocal) => {
+                  if (item.key === elementLocal.key){
+                    console.log("The index is: " + indexLocal);
+                    checkoutGlobalItems[indexLocal].quantity = item.quantity;
+                    //process the array in AsyncStorage
+                    AsyncStorage.removeItem(_CHECKOUT_GLOBAL_NAME, (error) => {
+                      if (error) {
+                        console.log(error);
+                      }
+                    });
+                    AsyncStorage.setItem(_CHECKOUT_GLOBAL_NAME, JSON.stringify(checkoutGlobalItems), (error) => {
+                      callback(error);
+                    });
+                  }
+                });
+              }
+            }else {
+            checkoutGlobalItems.push(item);
+            AsyncStorage.setItem(_CHECKOUT_GLOBAL_NAME, JSON.stringify(checkoutGlobalItems), (error) => {
+              callback(error);
+            });
+          }
+        }
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 module.exports = CheckoutHelper
