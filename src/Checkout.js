@@ -229,22 +229,28 @@ _updateTotals(){
                       />
                     )}
                   </View>
-                  <View style={styles.productTotalsStyle}>
-                    <View style={styles.marginBetweenTotals}>
-                      <Text style={styles.subtotalTextStyle}>Subtotal</Text>
-                      <Text style={styles.subtotalTextStyle}>Shipping</Text>
-                      <Text style={styles.subtotalTextStyleBold}>Total</Text>
-                      <View style={styles.taxMessageStyle}>
-                        <Text style={styles.taxMessageTextStyle}>*Tax calculated in checkout</Text>
+                  <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <View style={styles.productTotalsStyle}>
+                      <View style={styles.marginBetweenTotals}>
+                        <Text style={styles.subtotalTextStyle}>Subtotal</Text>
+                        <Text style={styles.subtotalTextStyle}>Shipping</Text>
+                        <Text style={styles.subtotalTextStyleBold}>Total</Text>
+                        <View style={styles.taxMessageStyle}>
+                          <Text style={styles.taxMessageTextStyle}>*Tax calculated in checkout</Text>
+                        </View>
+                      </View>
+                      <View>
+                        <Text style={styles.subtotalTextStyle}>$ {this.state.subtotal}</Text>
+                        <Text style={styles.subtotalTextStyle}>Free</Text>
+                        <Text style={styles.subtotalTextStyleBold}>$ {this.state.total}</Text>
                       </View>
                     </View>
-                    <View>
-                      <Text style={styles.subtotalTextStyle}>$ {this.state.subtotal}</Text>
-                      <Text style={styles.subtotalTextStyle}>Free</Text>
-                      <Text style={styles.subtotalTextStyleBold}>$ {this.state.total}</Text>
+                    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                      <TouchableOpacity style={styles.checkoutViewButtonStyle}>
+                        <Text style={styles.checkoutTextButtonStyle}>PROCESS TO CHECK OUT</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
-
                 </View>
             : <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
                 <Text> There are not products added to this cart </Text>
@@ -279,7 +285,6 @@ _updateTotals(){
         </View>
       );
     }
-
   }
 }
 
@@ -361,6 +366,22 @@ taxMessageTextStyle: {
   color: '#4A4A4A',
   fontSize: 10,
 },
+checkoutTextButtonStyle: {
+  color: '#07CF7C',
+  fontSize: 14,
+  fontWeight: '300',
+},
+checkoutViewButtonStyle: {
+  marginTop: 20,
+  marginBottom: 20,
+  height: 25,
+  width: 200,
+  borderWidth: 1,
+  borderColor: '#979797',
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+}
 });
 
 export default Checkout
