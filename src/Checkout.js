@@ -37,7 +37,7 @@ const Product = (props) => {
           />
         </TouchableOpacity>
       </View>
-      <Text style={[styles.productTextStyle, {width: 70}]}>${(props.price * props.quantity)}</Text>
+      <Text style={[styles.productTextStyle, {width: 70}]}>${(props.price * props.quantity).toFixed(2)}</Text>
       <TouchableOpacity onPress={props.deleteProduct}>
         <Icon
           name="delete"
@@ -89,6 +89,8 @@ class Checkout extends Component{
       products: null,
       showActivityIndicator: false,
       headerKey: 0,
+      subtotal: 0.00,
+      total: 0.00,
     }
     console.log(props)
   }
@@ -102,9 +104,10 @@ class Checkout extends Component{
       CheckoutHelper.getGlobalCheckout((result)=> {
         let value = JSON.parse(result);
         if (value !== null){
-          this.setState({products: value, showActivityIndicator: false})
+          this.setState({products: value, showActivityIndicator: false});
+          this._updateTotals();
         } else {
-          this.setState({showActivityIndicator: false})
+          this.setState({showActivityIndicator: false});
         }
       });
     } catch(error) {
@@ -125,7 +128,7 @@ updateMenu(isOpen){
 _reduceQuantity(item){
   var currentProducts = null;
   this.state.products.forEach((itemLocal, indexLocal, array) => {
-    if (item.key === itemLocal.key && itemLocal.quantity > 0){
+    if (item.key === itemLocal.key && item.quantity > 1){
       itemLocal.quantity -= 1;
       item.quantity = itemLocal.quantity;
       currentProducts = array
@@ -138,6 +141,7 @@ _reduceQuantity(item){
         console.log(error);
       } else {
         this.setState({products: currentProducts, headerKey: Math.random()});
+        this._updateTotals();
       }
     }, search);
   }
@@ -159,6 +163,7 @@ _addQuantity(item){
         console.log(error);
       } else {
         this.setState({products: currentProducts, headerKey: Math.random()});
+        this._updateTotals();
       }
     }, search);
   }
@@ -174,7 +179,20 @@ async _deleteProduct(index){
       console.log(error);
     }
   });
-  this.setState({products: currentProducts, headerKey: Math.random()})
+  this.setState({products: currentProducts, headerKey: Math.random()});
+  this._updateTotals();
+}
+
+_updateTotals(){
+  if (this.state.products){
+    var sutotal = 0;
+    this.state.products.forEach((itemLocal, indexLocal, array) => {
+      if (itemLocal.quantity > 0){
+        sutotal += (itemLocal.price * itemLocal.quantity);
+      }
+    });
+    this.setState({subtotal: sutotal.toFixed(2), total: sutotal.toFixed(2)});
+  }
 }
 
   render(){
@@ -188,37 +206,55 @@ async _deleteProduct(index){
           >
             <Header key={this.state.headerKey} toggle={this.toggle.bind(this)} navigator={this.props.navigator} products={this.state.products}/>
             <ScrollView style={styles.scrollContainer}>
-              {this.state.products.length > 0 ? <View>
-                <Text style={styles.orderDetailsStyle}>
-                  Order Details
-                </Text>
-                <View style={styles.productListStyle}>
-                  <View style={styles.headerColumnStyle}>
-                    <Text style={[styles.headerTextStyle, {width: 190}]}>Product</Text>
-                    <Text style={[styles.headerTextStyle, {width: 50}]}>Qty</Text>
-                    <Text style={[styles.headerTextStyle]}>Cost</Text>
+              {this.state.products.length > 0 ?
+                <View>
+                  <Text style={styles.orderDetailsStyle}>
+                    Order Details
+                  </Text>
+                  <View style={styles.productListStyle}>
+                    <View style={styles.headerColumnStyle}>
+                      <Text style={[styles.headerTextStyle, {width: 190}]}>Product</Text>
+                      <Text style={[styles.headerTextStyle, {width: 50}]}>Qty</Text>
+                      <Text style={[styles.headerTextStyle]}>Cost</Text>
+                    </View>
+                    {this.state.products.map((item, i) => <Product
+                      title={item.title}
+                      key={i}
+                      productKey={item.key}
+                      quantity={item.quantity}
+                      price={item.price}
+                      reduceQuantity={this._reduceQuantity.bind(this, item)}
+                      addQuantity={this._addQuantity.bind(this, item)}
+                      deleteProduct={this._deleteProduct.bind(this, i)}
+                      />
+                    )}
                   </View>
-                  {this.state.products.map((item, i) => <Product
-                    title={item.title}
-                    key={i}
-                    productKey={item.key}
-                    quantity={item.quantity}
-                    price={item.price}
-                    reduceQuantity={this._reduceQuantity.bind(this, item)}
-                    addQuantity={this._addQuantity.bind(this, item)}
-                    deleteProduct={this._deleteProduct.bind(this, i)}
-                    />
-                  )}
+                  <View style={styles.productTotalsStyle}>
+                    <View style={styles.marginBetweenTotals}>
+                      <Text style={styles.subtotalTextStyle}>Subtotal</Text>
+                      <Text style={styles.subtotalTextStyle}>Shipping</Text>
+                      <Text style={styles.subtotalTextStyleBold}>Total</Text>
+                      <View style={styles.taxMessageStyle}>
+                        <Text style={styles.taxMessageTextStyle}>*Tax calculated in checkout</Text>
+                      </View>
+                    </View>
+                    <View>
+                      <Text style={styles.subtotalTextStyle}>$ {this.state.subtotal}</Text>
+                      <Text style={styles.subtotalTextStyle}>Free</Text>
+                      <Text style={styles.subtotalTextStyleBold}>$ {this.state.total}</Text>
+                    </View>
                   </View>
-              </View>
+
+                </View>
             : <View style={{flex:1, justifyContent: 'center', alignItems: 'center'}}>
-              <Text> There are not products added to this cart </Text>
+                <Text> There are not products added to this cart </Text>
                 <Icon
                 name="remove-shopping-cart"
                 color="#4A4A4A"
                 size={50}
                 />
-            </View>}
+              </View>
+            }
             </ScrollView>
           </SideMenu>
         </View>
@@ -271,7 +307,6 @@ productListStyle: {
 },
 headerColumnStyle: {
   flexDirection: 'row',
-
 },
 headerTextStyle: {
 	color: '#4A4A4A',
@@ -296,7 +331,36 @@ activityIndicatorStyle: {
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: 'rgba(255,255,255,1)',
-}
+},
+productTotalsStyle: {
+  marginRight: 20,
+  marginTop: 20,
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+},
+subtotalTextStyle: {
+  color: '#4A4A4A',
+  fontSize: 16,
+  marginBottom: 10,
+},
+subtotalTextStyleBold: {
+  color: '#4A4A4A',
+  fontSize: 16,
+  marginBottom: 10,
+  fontWeight: 'bold',
+},
+marginBetweenTotals: {
+  marginRight: 50,
+},
+taxMessageViewStyle: {
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  flex: 1,
+},
+taxMessageTextStyle: {
+  color: '#4A4A4A',
+  fontSize: 10,
+},
 });
 
 export default Checkout
