@@ -66,7 +66,7 @@ class Menu extends Component{
 changeMenuSelected (option) {
   if (option != this.state.menuSelected){
       this.setState({menuSelected: option});
-      this.props.navigator.push({
+      this.props.navigator.replace({
           routeName: option,
         });
       }

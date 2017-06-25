@@ -51,10 +51,10 @@ class App extends Component{
   async getThumnails (snapshot, listType){
     var thumbnailsArray = [];
     await snapshot.forEach((childSnapshot) => {
-      var childKey = childSnapshot.key;
+      let childKey = childSnapshot.key;
       var childData = childSnapshot.val();
       if (childData){
-        thumbnailsArray.push({key: childData.key, name: childData.name, image: childData.thumbnailUrl, targetScreen: childData.targetScreen})
+        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrl, targetScreen: childData.targetScreen})
       }
     });
     switch(listType){
