@@ -4,7 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 
 import List from './components/List';
@@ -104,7 +104,7 @@ _reRenderHeader(){
             <Header key={this.state.headerKey} toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
               <Slide navigator={this.props.navigator} imagesSlider={this.state.imagesSlider} _reRenderHeader={this._reRenderHeader.bind(this)}/>
-              <List navigator={this.props.navigator} topProducts={this.state.topProducts} topAllAboutCBD={this.state.topAllAboutCBD} topInspiringStories={this.state.topInspiringStories}/>
+              <List navigator={this.props.navigator} topProducts={this.state.topProducts} topAllAboutCBD={this.state.topAllAboutCBD} topInspiringStories={this.state.topInspiringStories} menuSelected={this.props.menuSelected}/>
             </ScrollView>
           </SideMenu>
         </View>
@@ -127,7 +127,7 @@ _reRenderHeader(){
             </View>
         </SideMenu>
       </View>
-      )
+    );
     }
   }
 }

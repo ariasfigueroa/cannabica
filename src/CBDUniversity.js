@@ -4,24 +4,60 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 
 import List from './components/List';
 import Header from './components/Header';
 import SideMenu from 'react-native-side-menu';
-import Menu from './components/Menu'
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview'
+import Menu from './components/Menu';
+import { firebaseApp } from './lib/firebase';
+
+const cbdUniversitySections = ['/screens/cbdUniversity/allAboutCBD']
 
 class CBDUniversity extends Component{
 
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      allAboutCBD: null,
     }
     console.log(props);
+  }
+
+  componentWillMount(){
+    // get components and set allAboutCBDVideoList
+    try {
+      for (var index = 0; index < cbdUniversitySections.length; index++){
+        var ref = firebaseApp.database().ref(cbdUniversitySections[index])
+        ref.once('value', (snapshot) => {
+          if (snapshot.val()){
+            this.getThumnails(snapshot, snapshot.key)
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async getThumnails (snapshot, listType){
+    var thumbnailsArray = [];
+    await snapshot.forEach((childSnapshot) => {
+      let childKey = childSnapshot.key;
+      var childData = childSnapshot.val();
+      if (childData){
+        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrl, targetScreen: childData.targetScreen})
+      }
+    });
+    switch(listType){
+        case 'allAboutCBD' : {
+          this.setState({allAboutCBD: thumbnailsArray})
+          break
+        }
+      }
   }
 
 toggle(){
@@ -35,124 +71,48 @@ updateMenu(isOpen){
 }
 
   render(){
-    return (
-      <View style={styles.container}>
-        <SideMenu
-          menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
-          isOpen={this.state.isOpen}
-          onChange={(isOpen) => this.updateMenu(isOpen)}>
-          <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
-              <KeyboardAwareScrollView
-                style={styles.formViewContainerStyle}
-                keyboardDismissMode="interactive"
-                keyboardShouldPersistTaps="always"
-                getTextInputRefs={() => {return [this.input1,this.input2,this.input3,this.input4,this.input5,this.input6,this.input7,this.input8,this.input9,this.input10,this.input11,this.input12]}}>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input1) => this.input1 = input1}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input2) => this.input2 = input2}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input3) => this.input3 = input3}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input4) => this.input4 = input4}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input5) => this.input5 = input5}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input6) => this.input6 = input6}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input7) => this.input7 = input7}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input8) => this.input8 = input8}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input9) => this.input9 = input9}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input10) => this.input10 = input10}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input11) => this.input11 = input11}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                  style={{width: 100, height: 40}}
-                  placeholder={'Text'}
-                  autoCorrect={false}
-                  ref={(input12) => this.input12 = input12}
-                  />
-                </View>
-              </KeyboardAwareScrollView>
+    if (this.state.allAboutCBD && this.state.allAboutCBD.length > 0){
+      return (
+        <View style={styles.container}>
+          <SideMenu
+            menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
+            isOpen={this.state.isOpen}
+            onChange={(isOpen) => this.updateMenu(isOpen)}>
+            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <ScrollView style={styles.scrollContainer}>
+              <List navigator={this.props.navigator} allAboutCBDVideoList={this.state.allAboutCBD} menuSelected={this.props.menuSelected}/>
+            </ScrollView>
+          </SideMenu>
+        </View>
+      );
+    }else {
+      return(
+        <View style={styles.container}>
+          <SideMenu
+            menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
+            isOpen={this.state.isOpen}
+            onChange={(isOpen) => this.updateMenu(isOpen)}
+          >
+            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <View style={[styles.scrollContainer, {flex: 1, alignItems: 'center', justifyContent: 'center'}]}>
+              <ActivityIndicator
+                animating={(this.state.allAboutCBDVideoList && this.state.allAboutCBDVideoList.length > 0 ) ? false : true}
+                style={{height: 80}}
+                size="large"
+              />
+            </View>
         </SideMenu>
       </View>
     );
+    }
   }
 }
 
 const styles = StyleSheet.create({
   container:{
     flex: 1,
+  },
+  scrollContainer: {
     backgroundColor: '#ECF0F1',
   },
   formViewContainerStyle: {
