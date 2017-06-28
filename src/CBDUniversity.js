@@ -14,7 +14,7 @@ import SideMenu from 'react-native-side-menu';
 import Menu from './components/Menu';
 import { firebaseApp } from './lib/firebase';
 
-const cbdUniversitySections = ['/screens/cbdUniversity/allAboutCBD']
+const cbdUniversitySections = ['/screens/cbdUniversity/allAboutCBD', '/screens/cbdUniversity/cbdAndLaw']
 
 class CBDUniversity extends Component{
 
@@ -23,6 +23,7 @@ class CBDUniversity extends Component{
     this.state = {
       isOpen: false,
       allAboutCBD: null,
+      cbdAndLawList: null,
     }
     console.log(props);
   }
@@ -54,8 +55,12 @@ class CBDUniversity extends Component{
     });
     switch(listType){
         case 'allAboutCBD' : {
-          this.setState({allAboutCBD: thumbnailsArray})
-          break
+          this.setState({allAboutCBD: thumbnailsArray});
+          break;
+        }
+        case 'cbdAndLaw' : {
+          this.setState({cbdAndLawList: thumbnailsArray});
+          break;
         }
       }
   }
@@ -71,7 +76,7 @@ updateMenu(isOpen){
 }
 
   render(){
-    if (this.state.allAboutCBD && this.state.allAboutCBD.length > 0){
+    if ((this.state.allAboutCBD && this.state.allAboutCBD.length > 0) && (this.state.cbdAndLawList && this.state.cbdAndLawList.length > 0)){
       return (
         <View style={styles.container}>
           <SideMenu
@@ -80,7 +85,7 @@ updateMenu(isOpen){
             onChange={(isOpen) => this.updateMenu(isOpen)}>
             <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
-              <List navigator={this.props.navigator} allAboutCBDVideoList={this.state.allAboutCBD} menuSelected={this.props.menuSelected}/>
+              <List navigator={this.props.navigator} allAboutCBDVideoList={this.state.allAboutCBD} cbdAndLawList={this.state.cbdAndLawList} menuSelected={this.props.menuSelected} isImageLage={true}/>
             </ScrollView>
           </SideMenu>
         </View>

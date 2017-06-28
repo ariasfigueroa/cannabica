@@ -21,7 +21,22 @@ _setTargetScreen(item){
 _renderItem(item) {
   return(
     <TouchableOpacity onPress={this._setTargetScreen.bind(this, item)}>
-      <CachedImage style={styles.image} source={{uri: item.image}} />
+      <CachedImage style={this.props.isImageLage ? styles.imageLarge : styles.image} source={{uri: item.image}} />
+    </TouchableOpacity>
+  );
+}
+
+_renderItemVertical(item) {
+  return(
+    <TouchableOpacity onPress={this._setTargetScreen.bind(this, item)}>
+      <View style={styles.verticalContainer}>
+        <View style={styles.textVerticaTitleContainer}>
+          <Text style={styles.textVerticaTitle}>{item.name}</Text>
+        </View>
+        <View style={styles.imageVerticalContainer}>
+          <CachedImage style={styles.imageVerticalContainer} source={{uri: item.image}} />
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -38,9 +53,11 @@ _renderItem(item) {
     } else if (this.props.menuSelected === 'cbdUniversity'){
         this.state = {
         allAboutCBDVideoList: this.props.allAboutCBDVideoList,
+        cbdAndLawList: this.props.cbdAndLawList,
         menuSelected: this.props.menuSelected,
       }
     }
+    console.log(this.props.cbdAndLawList);
   }
 
   render(){
@@ -79,7 +96,7 @@ _renderItem(item) {
     } else if (this.state.menuSelected === 'cbdUniversity'){
       return (
         <View style={styles.container}>
-          {this.state.allAboutCBDVideoList ? <View style={styles.containerList}>
+        {this.state.allAboutCBDVideoList && this.state.allAboutCBDVideoList.length > 0 ? <View style={styles.containerList}>
           <Text style={styles.listTitleText}>All about CBD</Text>
           <FlatList
           removeClippedSubviews={false}
@@ -88,6 +105,15 @@ _renderItem(item) {
           renderItem={({item}) => this._renderItem(item)}
           data={this.state.allAboutCBDVideoList}/>
           </View> : null}
+        {this.state.cbdAndLawList && this.state.cbdAndLawList.length > 0 ? <View style={styles.containerList}>
+            <Text style={styles.listTitleText}>CBD and Law</Text>
+            <FlatList
+            removeClippedSubviews={false}
+            horizontal={true}
+            ItemSeparatorComponent={()=> <View style={{width: 10}}/>}
+            renderItem={({item}) => this._renderItem(item)}
+            data={this.state.cbdAndLawList}/>
+            </View> : null}
         </View>
       );
     }
@@ -102,9 +128,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ECF0F1'
   },
+  verticalContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    width: 414,
+    height: 120,
+  },
   image: {
     width: 100,
     height: 144,
+  },
+  imageLarge: {
+    width: 140,
+    height: 202,
+  },
+  imageVerticalContainer: {
+    width: 274,
+    height: 120,
+  },
+  textVerticaTitleContainer: {
+    width: 140,
+    height: 120,
+  },
+  textVerticaTitle: {
+    marginVertical: 10,
+    marginVertical: 10,
+  	color: '#4A4A4A',
+  	fontSize: 20,
+  	fontWeight: '300',
   },
   listTitleText:{
     fontSize: 20,
@@ -114,5 +165,9 @@ const styles = StyleSheet.create({
   },
   containerList: {
     paddingTop: 20,
+  },
+  containerListVertical: {
+    paddingTop: 20,
+    backgroundColor: '#FFFFFF',
   }
 });
