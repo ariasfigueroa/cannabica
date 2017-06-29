@@ -6,6 +6,7 @@ import {
   FlatList,
   Dimentions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 import CachedImage from 'react-native-cached-image';
@@ -68,12 +69,18 @@ constructor(props){
       key : item.key,
       price : item.price,
     }
+
     CheckoutHelper.setItemAsyncStorage(itemConverted, (error) => {
       if (error){
         console.log(error);
       } else {
-        this.props.refreshHeaderKey();
-        alert(itemConverted.title +' has been added to the car');
+        this.props.refreshHeaderKey();        
+        Alert.alert('Cannabica', itemConverted.title +' has been added to the car.',
+        [
+           {text: 'OK', onPress: () => console.log('OK Pressed')},
+         ],
+         { cancelable: false }
+       )
       }
     }, search);
   }

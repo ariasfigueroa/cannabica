@@ -132,7 +132,12 @@ class LineOfProductsDetails extends Component{
         console.log(error);
       } else {
         this.setState({products: products, headerKey:  Math.random()});
-        alert(this.state.title +' has been added to the car');
+        Alert.alert('Cannabica', this.state.title +' has been added to the car.',
+        [
+           {text: 'OK', onPress: () => console.log('OK Pressed')},
+         ],
+         { cancelable: false }
+       )
       }
     }, search);
   }
