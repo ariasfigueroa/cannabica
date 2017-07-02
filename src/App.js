@@ -83,6 +83,10 @@ toggle(){
   });
 }
 
+_showActivityIndicator(showActivityIndicator){
+  this.setState({showActivityIndicator});
+}
+
 updateMenu(isOpen){
   this.setState({isOpen});
 }
@@ -93,7 +97,26 @@ _reRenderHeader(){
 }
 
   render(){
-    if ((this.state.imagesSlider && this.state.topProducts && this.state.topAllAboutCBD && this.state.topInspiringStories) || this.state.showActivityIndicator){
+    if (this.state.showActivityIndicator === true){
+      return(
+        <View style={styles.container}>
+          <SideMenu
+            menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
+            isOpen={this.state.isOpen}
+            onChange={(isOpen) => this.updateMenu(isOpen)}
+          >
+            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <View style={[styles.scrollContainer, {flex: 1, alignItems: 'center', justifyContent: 'center'}]}>
+              <ActivityIndicator
+                animating={true}
+                style={{height: 80}}
+                size="large"
+              />
+            </View>
+        </SideMenu>
+      </View>
+    );
+    } else if ( (this.state.imagesSlider && this.state.topProducts && this.state.topAllAboutCBD && this.state.topInspiringStories) ){
       return (
         <View style={styles.container}>
           <SideMenu
@@ -104,7 +127,7 @@ _reRenderHeader(){
             <Header key={this.state.headerKey} toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
             <ScrollView style={styles.scrollContainer}>
               <Slide navigator={this.props.navigator} imagesSlider={this.state.imagesSlider} _reRenderHeader={this._reRenderHeader.bind(this)}/>
-              <List navigator={this.props.navigator} topProducts={this.state.topProducts} topAllAboutCBD={this.state.topAllAboutCBD} topInspiringStories={this.state.topInspiringStories} menuSelected={this.props.menuSelected}/>
+              <List navigator={this.props.navigator} topProducts={this.state.topProducts} topAllAboutCBD={this.state.topAllAboutCBD} topInspiringStories={this.state.topInspiringStories} menuSelected={this.props.menuSelected} showActivityIndicator={this._showActivityIndicator.bind(this)}/>
             </ScrollView>
           </SideMenu>
         </View>

@@ -101,11 +101,13 @@ changeMenuSelected (option) {
               Retail Locations
             </Text>
           </TouchableOpacity>
+          {/**
           <TouchableOpacity onPress={this.changeMenuSelected.bind(this, 'cbdCalculator')} style={this.state.menuSelected === 'cbdCalculator' ? styles.topMenuSelected : styles.topMenuNotSelected}>
             <Text style={styles.textMenu}>
               CBD Calculator
             </Text>
           </TouchableOpacity>
+          **/}
         </View>
 
         <View style={styles.menu}>

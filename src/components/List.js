@@ -13,10 +13,23 @@ import CachedImage from 'react-native-cached-image';
 class List extends Component{
 
 _setTargetScreen(item){
-  this.props.navigator.push({
-      routeName: item.targetScreen,
-      productKey: item.key,
-  });
+  if (this.props.showActivityIndicator){
+    this.props.showActivityIndicator(true);
+    setTimeout (()=> {
+      this.props.navigator.push({
+          routeName: item.targetScreen,
+          productKey: item.key,
+      });
+      this.props.showActivityIndicator(false);
+    }, 500)
+
+  } else {
+    this.props.navigator.push({
+        routeName: item.targetScreen,
+        productKey: item.key,
+    });
+  }
+
 }
 _renderItem(item) {
   return(
@@ -26,17 +39,10 @@ _renderItem(item) {
   );
 }
 
-_renderItemVertical(item) {
+_renderItemColumn(item) {
   return(
     <TouchableOpacity onPress={this._setTargetScreen.bind(this, item)}>
-      <View style={styles.verticalContainer}>
-        <View style={styles.textVerticaTitleContainer}>
-          <Text style={styles.textVerticaTitle}>{item.name}</Text>
-        </View>
-        <View style={styles.imageVerticalContainer}>
-          <CachedImage style={styles.imageVerticalContainer} source={{uri: item.image}} />
-        </View>
-      </View>
+      <CachedImage style={this.props.isImageLage ? styles.imageLargeHorizontal : styles.imageHorizontal} source={{uri: item.image}} />
     </TouchableOpacity>
   );
 }
@@ -54,6 +60,11 @@ _renderItemVertical(item) {
         this.state = {
         allAboutCBDVideoList: this.props.allAboutCBDVideoList,
         cbdAndLawList: this.props.cbdAndLawList,
+        menuSelected: this.props.menuSelected,
+      }
+    } else if (this.props.menuSelected === 'insporationalStories'){
+        this.state = {
+        inspiringStoriesAll: this.props.inspiringStoriesAll,
         menuSelected: this.props.menuSelected,
       }
     }
@@ -97,7 +108,7 @@ _renderItemVertical(item) {
       return (
         <View style={styles.container}>
         {this.state.allAboutCBDVideoList && this.state.allAboutCBDVideoList.length > 0 ? <View style={styles.containerList}>
-          <Text style={styles.listTitleText}>All about CBD</Text>
+          <Text style={styles.listTitleText}>Video</Text>
           <FlatList
           removeClippedSubviews={false}
           horizontal={true}
@@ -106,14 +117,28 @@ _renderItemVertical(item) {
           data={this.state.allAboutCBDVideoList}/>
           </View> : null}
         {this.state.cbdAndLawList && this.state.cbdAndLawList.length > 0 ? <View style={styles.containerList}>
-            <Text style={styles.listTitleText}>CBD and Law</Text>
+            <Text style={styles.listTitleText}>Articles</Text>
             <FlatList
             removeClippedSubviews={false}
-            horizontal={true}
-            ItemSeparatorComponent={()=> <View style={{width: 10}}/>}
-            renderItem={({item}) => this._renderItem(item)}
+            numColumns= {3}
+            columnWrapperStyle={{marginBottom: 10}}
+            renderItem={({item}) => this._renderItemColumn(item)}
             data={this.state.cbdAndLawList}/>
             </View> : null}
+        </View>
+      );
+    } else if (this.state.menuSelected === 'insporationalStories'){
+      return (
+        <View style={styles.container}>
+        {this.state.inspiringStoriesAll && this.state.inspiringStoriesAll.length > 0 ? <View style={styles.containerList}>
+          <Text style={styles.listTitleText}>Inspiring Stories</Text>
+          <FlatList
+          removeClippedSubviews={false}
+          numColumns= {3}
+          columnWrapperStyle={{marginBottom: 10}}
+          renderItem={({item}) => this._renderItemColumn(item)}
+          data={this.state.inspiringStoriesAll}/>
+          </View> : null}
         </View>
       );
     }
@@ -139,8 +164,18 @@ const styles = StyleSheet.create({
     height: 144,
   },
   imageLarge: {
-    width: 140,
-    height: 202,
+    width: 100,
+    height: 144,
+  },
+  imageHorizontal: {
+    width: 100,
+    height: 144,
+    marginRight: 10,
+  },
+  imageLargeHorizontal: {
+    width: 100,
+    height: 144,
+    marginRight: 10,
   },
   imageVerticalContainer: {
     width: 274,

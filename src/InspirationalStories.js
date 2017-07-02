@@ -4,21 +4,60 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 
 import List from './components/List';
 import Header from './components/Header';
 import SideMenu from 'react-native-side-menu';
-import Menu from './components/Menu'
+import Menu from './components/Menu';
+import { firebaseApp } from './lib/firebase';
+
+const cbdUniversitySections = ['/screens/inspiringStories/all']
 
 class InspirationalStories extends Component{
 
   constructor(props) {
     super(props);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      inspiringStoriesAll: null,
     }
-    console.log(props)
+    console.log(props);
+  }
+
+  componentWillMount(){
+    // get components and set allAboutCBDVideoList
+    try {
+      for (var index = 0; index < cbdUniversitySections.length; index++){
+        var ref = firebaseApp.database().ref(cbdUniversitySections[index])
+        ref.once('value', (snapshot) => {
+          if (snapshot.val()){
+            this.getThumnails(snapshot, snapshot.key)
+          }
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async getThumnails (snapshot, listType){
+    var thumbnailsArray = [];
+    await snapshot.forEach((childSnapshot) => {
+      let childKey = childSnapshot.key;
+      var childData = childSnapshot.val();
+      if (childData){
+        thumbnailsArray.push({key: childKey, name: childData.title, image: childData.thumbnailUrl, targetScreen: childData.targetScreen})
+      }
+    });
+    switch(listType){
+        case 'all' : {
+          this.setState({inspiringStoriesAll: thumbnailsArray});
+          break;
+        }
+      }
   }
 
 toggle(){
@@ -32,22 +71,40 @@ updateMenu(isOpen){
 }
 
   render(){
-    return (
-      <View style={styles.container}>
-        <SideMenu
-          menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
-          isOpen={this.state.isOpen}
-          onChange={(isOpen) => this.updateMenu(isOpen)}
-        >
-          <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
-          <ScrollView style={styles.scrollContainer}>
-            <Text>
-              Here goes the Inspirationl Stories.
-            </Text>
-          </ScrollView>
+    if (this.state.inspiringStoriesAll && this.state.inspiringStoriesAll.length > 0){
+      return (
+        <View style={styles.container}>
+          <SideMenu
+            menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
+            isOpen={this.state.isOpen}
+            onChange={(isOpen) => this.updateMenu(isOpen)}>
+            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <ScrollView style={styles.scrollContainer}>
+              <List navigator={this.props.navigator} inspiringStoriesAll={this.state.inspiringStoriesAll} menuSelected={this.props.menuSelected} isImageLage={true}/>
+            </ScrollView>
+          </SideMenu>
+        </View>
+      );
+    }else {
+      return(
+        <View style={styles.container}>
+          <SideMenu
+            menu={<Menu toggle={this.toggle.bind(this)} navigator={this.props.navigator} menuSelected={this.props.menuSelected}/>}
+            isOpen={this.state.isOpen}
+            onChange={(isOpen) => this.updateMenu(isOpen)}
+          >
+            <Header toggle={this.toggle.bind(this)} navigator={this.props.navigator}/>
+            <View style={[styles.scrollContainer, {flex: 1, alignItems: 'center', justifyContent: 'center'}]}>
+              <ActivityIndicator
+                animating={(this.state.allAboutCBDVideoList && this.state.allAboutCBDVideoList.length > 0 ) ? false : true}
+                style={{height: 80}}
+                size="large"
+              />
+            </View>
         </SideMenu>
       </View>
     );
+    }
   }
 }
 
@@ -56,6 +113,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
+    backgroundColor: '#ECF0F1',
+  },
+  formViewContainerStyle: {
+    flex: 1,
     backgroundColor: '#ECF0F1',
   }
 });

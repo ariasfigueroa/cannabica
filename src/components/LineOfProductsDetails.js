@@ -86,7 +86,7 @@ class LineOfProductsDetails extends Component{
               price: onResolve.val().price,
               showActivityIndicator: false
             })
-          }, 1000)
+          }, 500)
         } else {
           console.log(onResolve)
           this.setState({showActivityIndicator: false})
